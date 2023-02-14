@@ -1,0 +1,3 @@
+"Reference Position","Type","Length","Reference","Allele","Linkage","Zygosity","Count","Coverage","Frequency","Forward/reverse balance","Average quality","Overlapping annotations","Coding region change","Amino acid change"
+"1548","SNV","1","A","G","","Homozygous","39","40","97.5","0.1794871795","34.3076923077","","REFERENCE:c.219-4A>G",""
+"2710","SNV","1","C","T","","Heterozygous","2401","4750","50.5473684211","0.4327363599","36.0603915035","ORF: REFERENCE","REFERENCE:c.405C>T",""
