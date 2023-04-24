@@ -13,11 +13,43 @@ from pathlib import Path
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('-i', '--input', required=True, dest='input', help='Path to folder containing CSVs to summarize.')
-    parser.add_argument('-o', '--output', required=True, dest='output', help='Name of output file to generate.')
-    parser.add_argument('-c', default=10, type=int, dest='coverage', help='Define a minimum depth of coverage a sample must present to be reported.')
-    parser.add_argument('-d', action='store_true', dest='indepth', help='Set this flag to report not only genotypes but also allele frequencies')
-    parser.add_argument('--keep_silent', action='store_true', dest='keep_silent', help='Set this flag to retain silent AA changes')
+    parser.add_argument(
+        '-i',
+        '--input',
+        required=True,
+        dest='input',
+        help='Path to folder containing CSVs to summarize.'
+    )
+    parser.add_argument(
+        '-o',
+        '--output',
+        required=True,
+        dest='output',
+        help='Name of output file to generate.'
+    )
+    depth_help = 'Define a minimum depth of coverage a sample must present '
+    depth_help += 'to be reported.'
+    parser.add_argument(
+        '-c',
+        default=10,
+        type=int,
+        dest='coverage',
+        help=depth_help
+    )
+    indepth_help = 'Set this flag to report not only genotypes but also '
+    indepth_help += 'allele frequencies.'
+    parser.add_argument(
+        '-d',
+        action='store_true',
+        dest='indepth',
+        help=indepth_help
+    )
+    parser.add_argument(
+        '--keep_silent',
+        action='store_true',
+        dest='keep_silent',
+        help='Set this flag to retain silent AA changes'
+    )
     args = parser.parse_args()
 
     coverage_cutoff = args.coverage
@@ -44,7 +76,7 @@ if __name__ == '__main__':
                 if coverage < coverage_cutoff:
                     continue
                 amino_change = row.get('Amino acid change', '')
-                if (keep_silent == False) and (amino_change == ''):
+                if (keep_silent is False) and (amino_change == ''):
                     continue
                 amino_change = amino_change.split('p.')[-1].strip('[]')
                 info = {
