@@ -37,9 +37,11 @@ if __name__ == '__main__':
         help=depth_help
     )
     indepth_help = 'Set this flag to report not only genotypes but also '
-    indepth_help += 'allele frequencies.'
+    indepth_help += 'allele frequencies. Is not compatible with downstream '
+    indepth_help += 'tools, and is only provided for debugging/investigation.'
     parser.add_argument(
         '-d',
+        '--indepth',
         action='store_true',
         dest='indepth',
         help=indepth_help
