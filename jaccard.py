@@ -12,7 +12,7 @@ def csv_to_pairwise_dist(file_in: Union[str, Path], columns: List[str]=None, com
         compare = jaccard_distance
     df = pd.read_csv(file_in, dtype=str)
     if columns == None:
-        columns = df.columns[4:]
+        columns = df.columns[5:]
     intersection = df.columns.intersection(columns)
     # this particular comprehension preserves the order of the columns provided in the resulting df
     df = df.loc[:, [c for c in columns if c in intersection]]
