@@ -58,6 +58,7 @@ if __name__ == '__main__':
 
     filenames = list(Path(args.input).iterdir())
     headers = [
+        'reference_name',
         'reference_pos',
         'reference_allele',
         'sample_allele',
@@ -79,7 +80,9 @@ if __name__ == '__main__':
                 if (keep_silent is False) and (amino_change == ''):
                     continue
                 amino_change = amino_change.split('p.')[-1].strip('[]')
+                mapping_name = row.get('Mapping')
                 info = {
+                    'reference_name': mapping_name,
                     'reference_pos': row.get('Reference Position'),
                     'reference_allele': row.get('Reference'),
                     'sample_allele': row.get('Allele'),
@@ -91,20 +94,28 @@ if __name__ == '__main__':
                 count = int(row.get('Count', 0))
                 frequency = round(float(row.get('Frequency', 0)), 3)
                 in_depth = f'{zygosity}:{count}/{coverage}({frequency})'
-                if info_hash not in changes:
-                    changes[info_hash] = info
+                if changes.get(mapping_name) == None:
+                    changes[mapping_name] = {}
+
+                if info_hash not in changes[mapping_name]:
+                    changes[mapping_name][info_hash] = info
 
                 if show_in_depth:
-                    changes[info_hash][str(Path(filename).stem)] = in_depth
+                    changes[mapping_name][info_hash][str(Path(filename).stem)] = in_depth
                 else:
                     if zygosity == 'Hom':
                         symbol = '11'
                     else:
                         symbol = '10'
-                    changes[info_hash][str(Path(filename).stem)] = symbol
+                    changes[mapping_name][info_hash][str(Path(filename).stem)] = symbol
 
     with open(args.output, 'w', newline='') as fout:
         writer = csv.DictWriter(fout, fieldnames=headers, quotechar='"')
         writer.writeheader()
-        for info_hash, info in changes.items():
-            writer.writerow(info)
+        sorted_mapping_names = sorted(list(changes.keys()))
+        for mapping_name in sorted_mapping_names:
+            by_mapping = changes[mapping_name]
+            hashes_by_ref_pos = sorted(by_mapping, key=lambda x: int(x[1]))
+            for info_hash in hashes_by_ref_pos:
+                row = changes[mapping_name][info_hash]
+                writer.writerow(row)
