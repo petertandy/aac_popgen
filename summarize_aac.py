@@ -27,6 +27,21 @@ if __name__ == '__main__':
         dest='output',
         help='Name of output file to generate.'
     )
+    parser.add_argument(
+        '-n',
+        '--default_name',
+        default='',
+        type=str,
+        dest='default_name',
+        help='This will give empy Mapping names a default name. This includes the case where there is no Mapping column.'
+    )
+    parser.add_argument(
+        '-s',
+        '--split',
+        action='store_true',
+        dest='split',
+        help='Also output an individual file for every mapping name'
+    )
     depth_help = 'Define a minimum depth of coverage a sample must present '
     depth_help += 'to be reported.'
     parser.add_argument(
@@ -82,7 +97,9 @@ if __name__ == '__main__':
                 if (keep_silent is False) and (amino_change == ''):
                     continue
                 amino_change = amino_change.split('p.')[-1].strip('[]')
-                mapping_name = row.get('Mapping')
+                mapping_name = row.get('Mapping', '')
+                if mapping_name == '':
+                    mapping_name = args.default_name
                 info = {
                     'reference_name': mapping_name,
                     'reference_pos': row.get('Reference Position'),
@@ -118,6 +135,23 @@ if __name__ == '__main__':
         for mapping_name in sorted_mapping_names:
             by_mapping = changes[mapping_name]
             hashes_by_ref_pos = sorted(by_mapping, key=lambda x: int(x[1]))
+            if args.split == True:
+                split_fn = str(args.output).rstrip('.csv')
+                split_fn += '_'
+                split_fn += mapping_name.replace(' ', '_')
+                split_fn += '.csv'
+                split_out = open(split_fn, 'w', newline='')
+                split_writer = csv.DictWriter(
+                    split_out,
+                    fieldnames=headers,
+                    quotechar='"'
+                )
+                split_writer.writeheader()
             for info_hash in hashes_by_ref_pos:
                 row = changes[mapping_name][info_hash]
                 writer.writerow(row)
+                if args.split == True:
+                    split_writer.writerow(row)
+            if args.split == True:
+                split_out.close()
+
