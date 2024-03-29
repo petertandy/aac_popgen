@@ -47,18 +47,20 @@ if __name__ == '__main__':
         gt = gt[gt['reference_allele'] != 'N']
     num_n_loci = pre_len[0] - gt.shape[0]
 
-    # loci are dropped before samples, assuming that samples are
-    #   more complete than loci.
-    #
+    # loci are dropped before samples, assuming that samples are more complete
+    # than loci.
     # drop loci (rows) if they are in too few samples
-    _loci_thresh = int(math.ceil(len(gt.columns[5:]) * loci_thresh))
+    num_thresh_cols = len(gt.columns[5:])
+    _loci_thresh = int(math.ceil(num_thresh_cols * loci_thresh))
     gt = gt.dropna(axis='index', thresh=_loci_thresh, subset=gt.columns[5:])
 
     # drop samples (columns) if they have too few loci
-    _sample_thresh = int(math.ceil(len(gt.index)*sample_thresh))
+    num_thresh_rows = len(gt.index)
+    _sample_thresh = int(math.ceil(num_thresh_rows * sample_thresh))
     _gt = gt.dropna(axis='columns', thresh=_sample_thresh)
 
-    # the change column was likely dropped if there is
+    # the change column was likely dropped because we can't change the behavior
+    # of df.dropna, so insert it back in if it's missing
     try:
         _gt.insert(2, 'amino_acid_change', gt['amino_acid_change'])
     except ValueError:
@@ -78,11 +80,23 @@ if __name__ == '__main__':
     pre_volume = pre_len[0] * pre_len[1]
     post_volume = post_len[0] * post_len[1]
     vol_reduction = post_volume / pre_volume
-    print(f'Dropped {num_dropped_loci} loci.')
-    print(f'{num_n_loci} were N loci.')
-    print(f'{num_no_mutant} were empty or had no mutant alleles after other filters.')
-    print(f'Dropped {num_dropped_samples} samples.')
-    print(f'Volume changed by {vol_reduction:.2%}.')
+
+    # some stats you can capture from stdout if you want
+    print(f'Input file: {fin}')
+    print(f'Output file: {fout}')
+    print('Locus filter:')
+    print(f'\tThreshold supplied: {loci_thresh}')
+    print(f'\tActual: {_loci_thresh}/{num_thresh_cols} ~= {loci_thresh} * {num_thresh_cols} / {num_thresh_cols}')
+    print(f'\tLoci dropped: {num_dropped_loci}')
+    print(f'\t\t{num_n_loci} were N loci')
+    print(f'\t\t{num_no_mutant} were empty or had no mutant alleles after other filters')
+
+    print('Sample threshold:')
+    print(f'\tThreshold supplied: {sample_thresh}')
+    print(f'\tActual: {_sample_thresh}/{num_thresh_rows} ~= {sample_thresh} * {num_thresh_rows} / {num_thresh_rows}')
+    print(f'\tSamples dropped: {num_dropped_samples}')
+
+    print(f'Table volume changed by {vol_reduction:.2%}')
     print(f'\t{pre_len[0]}x{pre_len[1]} -> {post_len[0]}x{post_len[1]}')
     print(f'\t{pre_volume} -> {post_volume}')
 

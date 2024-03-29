@@ -13,10 +13,13 @@ if __name__ == '__main__':
     parser.add_argument('-f', dest='dist_file', type=str, required=True)
     parser.add_argument('-o', dest='out_file', type=str, default='')
     parser.add_argument('-t', dest='heatmap_title', type=str, default='')
+    parser.add_argument('-x', dest='fig_x', type=int, default=5)
+    parser.add_argument('-y', dest='fig_y', type=int, default=5)
+    parser.add_argument('--dpi', dest='fig_dpi', type=int, default=300)
     args = parser.parse_args()
 
     df = pd.read_csv(args.dist_file, index_col='sample')
-    fig, ax = plot.subplots(figsize=(5, 5), dpi=300)
+    fig, ax = plot.subplots(figsize=(args.fig_x, args.fig_y), dpi=args.fig_dpi)
     sns.heatmap(df, ax=ax, vmin=0.0, vmax=1.0, cmap='viridis', square=True, cbar_kws={"shrink": .8})
 
     ax.set_xticks(np.arange(0.5, df.shape[0]))
