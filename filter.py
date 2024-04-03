@@ -79,7 +79,7 @@ if __name__ == '__main__':
     num_dropped_samples = pre_len[1] - post_len[1]
     pre_volume = pre_len[0] * pre_len[1]
     post_volume = post_len[0] * post_len[1]
-    vol_reduction = post_volume / pre_volume
+    vol_reduction = 1.0 - (post_volume / pre_volume)
 
     # some stats you can capture from stdout if you want
     print(f'Input file: {fin}')
