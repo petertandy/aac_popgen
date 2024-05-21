@@ -8,7 +8,22 @@ in the CSVs.
 
 import argparse
 import csv
+import gzip
 from pathlib import Path
+
+
+def open_csv(
+        filename: Path,
+        *,
+        newline: 'Union[None,str]'=None
+        ) -> 'io.TextWrapper':
+    ''' Open `filename` with gzip if it seems compressed,
+    otherwise just open the file.'''
+    if '.gz' in filename.suffixes:
+        fin = gzip.open(filename, mode='rt', newline=newline)
+    else:
+        fin = open(filename, newline=newline)
+    return fin
 
 
 if __name__ == '__main__':
@@ -27,13 +42,17 @@ if __name__ == '__main__':
         dest='output',
         help='Name of output file to generate.'
     )
+    default_name_help = 'This will give empty Mapping names a default name'
+    default_name_help += ' if one cannot be determined from either the '
+    default_name_help += ' "Mapping" column or the "Coding region change"'
+    default_name_help += ' column.'
     parser.add_argument(
         '-n',
         '--default_name',
         default='',
         type=str,
         dest='default_name',
-        help='This will give empy Mapping names a default name. This includes the case where there is no Mapping column.'
+        help=default_name_help
     )
     parser.add_argument(
         '-s',
@@ -87,7 +106,7 @@ if __name__ == '__main__':
 
     changes = {}
     for filename in filenames:
-        with open(filename, newline='') as fin:
+        with open_csv(filename, newline='') as fin:
             reader = csv.DictReader(fin, delimiter=',', quotechar='"')
             for row in reader:
                 coverage = int(row.get('Coverage', 0))
@@ -99,7 +118,12 @@ if __name__ == '__main__':
                 amino_change = amino_change.split('p.')[-1].strip('[]')
                 mapping_name = row.get('Mapping', '')
                 if mapping_name == '':
-                    mapping_name = args.default_name
+                    sensed_name = row.get('Coding region change', ':')
+                    sensed_name = sensed_name.split(':')[0]
+                    if sensed_name == '':
+                        mapping_name = args.default_name
+                    else:
+                        mapping_name = sensed_name
                 info = {
                     'reference_name': mapping_name,
                     'reference_pos': row.get('Reference Position'),
