@@ -43,9 +43,8 @@ if __name__ == '__main__':
         help='Name of output file to generate.'
     )
     default_name_help = 'This will give empty Mapping names a default name'
-    default_name_help += ' if one cannot be determined from either the '
-    default_name_help += ' "Mapping" column or the "Coding region change"'
-    default_name_help += ' column.'
+    default_name_help += ' if one cannot be determined from the'
+    default_name_help += ' "Mapping" column.'
     parser.add_argument(
         '-n',
         '--default_name',
@@ -118,12 +117,8 @@ if __name__ == '__main__':
                 amino_change = amino_change.split('p.')[-1].strip('[]')
                 mapping_name = row.get('Mapping', '')
                 if mapping_name == '':
-                    sensed_name = row.get('Coding region change', ':')
-                    sensed_name = sensed_name.split(':')[0]
-                    if sensed_name == '':
                         mapping_name = args.default_name
-                    else:
-                        mapping_name = sensed_name
+
                 info = {
                     'reference_name': mapping_name,
                     'reference_pos': row.get('Reference Position'),
