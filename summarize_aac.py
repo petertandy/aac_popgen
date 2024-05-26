@@ -42,9 +42,9 @@ if __name__ == '__main__':
         dest='output',
         help='Name of output file to generate.'
     )
-    default_name_help = 'This will give empty Mapping names a default name'
-    default_name_help += ' if one cannot be determined from the'
-    default_name_help += ' "Mapping" column.'
+    default_name_help = 'This will give empty Mapping names a default name '
+    default_name_help += 'if one cannot be determined from the '
+    default_name_help += '"Mapping" column.'
     parser.add_argument(
         '-n',
         '--default_name',
@@ -111,10 +111,12 @@ if __name__ == '__main__':
                 coverage = int(row.get('Coverage', 0))
                 if coverage < coverage_cutoff:
                     continue
+
                 amino_change = row.get('Amino acid change', '')
                 if (keep_silent is False) and (amino_change == ''):
                     continue
                 amino_change = amino_change.split('p.')[-1].strip('[]')
+
                 mapping_name = row.get('Mapping', '')
                 if mapping_name == '':
                         mapping_name = args.default_name
@@ -126,12 +128,15 @@ if __name__ == '__main__':
                     'sample_allele': row.get('Allele'),
                     'amino_acid_change': amino_change
                 }
+
                 # change the pertinent info into a hashable type
                 info_hash = tuple(info.values())
+
                 zygosity = row.get('Zygosity', 'N/A')[:3]
                 count = int(row.get('Count', 0))
                 frequency = round(float(row.get('Frequency', 0)), 3)
                 in_depth = f'{zygosity}:{count}/{coverage}({frequency})'
+
                 if changes.get(mapping_name) == None:
                     changes[mapping_name] = {}
 
