@@ -28,8 +28,8 @@ if __name__ == '__main__':
 
         if (row['amino_acid_change'][-2:] == 'fs') or row['amino_acid_change'][-1] == '*':
             fs_writer.writerow(row)
-
-        ns_writer.writerow(row)
+        else:
+            ns_writer.writerow(row)
 
     fin.close()
     fs_out.close()
