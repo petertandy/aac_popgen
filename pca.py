@@ -33,7 +33,7 @@ def csv_to_pca_groups_df(groups_file: Path) -> pd.DataFrame:
     groups_df = pd.from_dict(groups)
     return groups
 
-distinct_markers = ['o', '^', 's', 'D', 'p']
+distinct_markers = ['o', '^', 's', 'D', 'p', "*", "P"]
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
